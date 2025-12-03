@@ -350,6 +350,10 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     native(wfbngLinkN)->stop(env, androidContext, fd);
 }
 
+float map_range(float value, float inputMin, float inputMax, float outputMin, float outputMax) {
+    return outputMin + ((value - inputMin) * (outputMax - outputMin) / (inputMax - inputMin));
+}
+
 extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_nativeCallBack(JNIEnv *env,
                                                                                          jclass clazz,
                                                                                          jobject wfbStatChangedI,
@@ -363,12 +367,16 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
     if (jcStats == nullptr) {
         return;
     }
-    jmethodID jcStatsConstructor = env->GetMethodID(jcStats, "<init>", "(IIIIIIII)V");
+    jmethodID jcStatsConstructor = env->GetMethodID(jcStats, "<init>", "(IIIIIIIII)V");
     if (jcStatsConstructor == nullptr) {
         return;
     }
     SignalQualityCalculator::get_instance().add_fec_data(
         aggregator->count_p_all, aggregator->count_p_fec_recovered, aggregator->count_p_lost);
+
+    auto quality = SignalQualityCalculator::get_instance().calculate_signal_quality();
+    uint32_t avg_rssi_int = round(map_range(quality.quality, -1024.f, 1024.f, 0.f, 100.f));
+
     auto stats = env->NewObject(jcStats,
                                 jcStatsConstructor,
                                 (jint)aggregator->count_p_all,
@@ -378,7 +386,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_openipc_wfbngrtl8812_WfbNgLink_native
                                 (jint)aggregator->count_p_lost,
                                 (jint)aggregator->count_p_bad,
                                 (jint)aggregator->count_p_override,
-                                (jint)aggregator->count_p_outgoing);
+                                (jint)aggregator->count_p_outgoing,
+                                (jint)avg_rssi_int);
     if (stats == nullptr) {
         return;
     }
