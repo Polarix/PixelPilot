@@ -1,5 +1,31 @@
 <resources>
-    <string name="app_name">PixelPilot</string>
+    <string name="app_name">数字图传</string>
+    <string name="menu0_on">开启</string>
+    <string name="menu0_off">关闭</string>
+    <string name="menu0_enable">启用</string>
+    <string name="menu0_disable">禁用</string>
+    <string name="menu0_start">开始</string>
+    <string name="menu0_stop">停止</string>
+    <string name="menu0_no_adapter">未找到兼容的无线网络设备</string>
+    <string name="menu1_vrmode">VR模式</string>
+    <string name="menu2_channel">信道</string>
+    <string name="menu2_1_current">当前信道</string>
+    <string name="menu3_bandwidth">带宽</string>
+    <string name="menu3_1_current">当前带宽</string>
+    <string name="menu4_osd">屏幕显示(OSD)</string>
+    <string name="menu5_wfbng_key">WFB-NG密钥</string>
+    <string name="menu5_1_gskey">选择密钥文件(gs.key)</string>
+    <string name="menu6_adaptive_link">自适应链接</string>
+    <string name="menu6_1_enable">启用</string>
+    <string name="menu6_2_power">功率</string>
+    <string name="menu6_3_fec">FEC</string>
+    <string name="menu6_4_ldpc">LDPC</string>
+    <string name="menu6_4_stbc">STBC</string>
+    <string name="menu7_recording">录制</string>
+    <string name="menu7_2_fmp4_format">使用FMP4格式</string>
+    <string name="menu7_3_reset_dvr_folder">重置DVR文件夹</string>
+    <string name="menu9_help">帮助</string>
+    <string name="menu9_1_send_log">发送日志文件</string>
     <string-array name="channels">
         <item>1</item>
         <item>2</item>

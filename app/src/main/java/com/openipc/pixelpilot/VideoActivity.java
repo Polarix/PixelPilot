@@ -575,11 +575,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：VR模式开关(VR mode)
      * Submenu that toggles VR mode.
      */
     private void setupVRSubMenu(PopupMenu popup) {
-        SubMenu vrMenu = popup.getMenu().addSubMenu("VR mode");
-        MenuItem vrItem = vrMenu.add(getVRSetting() ? "On" : "Off");
+        SubMenu vrMenu = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu1_vrmode));
+        MenuItem vrItem = vrMenu.add(getVRSetting() ?
+                getResources().getString(R.string.menu0_on) : getResources().getString(R.string.menu0_off));
         vrItem.setOnMenuItemClickListener(item -> {
             isVRMode = !getVRSetting();
             setVRSetting(isVRMode);
@@ -592,14 +595,17 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：信道(Channel)
      * Submenu that lists available channels and allows the user to select one.
      */
     private void setupChannelSubMenu(PopupMenu popup) {
-        SubMenu chnMenu = popup.getMenu().addSubMenu("Channel");
+        SubMenu chnMenu = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu2_channel));
         int channelPref = getChannel(this);
 
         // Create a disabled item to act as the header
-        MenuItem headerItem = chnMenu.add("Current: " + channelPref);
+        MenuItem headerItem = chnMenu.add(
+                getResources().getString(R.string.menu2_1_current) + " : " + channelPref);
         headerItem.setEnabled(false); // Makes it unclickable and grayed out like a label
 
         String[] channels = getResources().getStringArray(R.array.channels);
@@ -612,14 +618,17 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：带宽(Bandwidth)
      * Submenu that allows the user to select 20 or 40 MHz bandwidth.
      */
     private void setupBandwidthSubMenu(PopupMenu popup) {
-        SubMenu bwMenu = popup.getMenu().addSubMenu("Bandwidth");
+        SubMenu bwMenu = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu3_bandwidth));
         int bandwidthPref = getBandwidth(this);
 
         // Add a disabled item to act as the header
-        MenuItem headerItem = bwMenu.add("Current: " + bandwidthPref);
+        MenuItem headerItem = bwMenu.add(
+                getResources().getString(R.string.menu3_1_current) + " : " + bandwidthPref);
         headerItem.setEnabled(false); // Visually looks like a header, but unclickable
 
         String[] bws = getResources().getStringArray(R.array.bandwidths);
@@ -632,10 +641,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：屏幕显示(OSD)
      * Submenu handling OSD toggles and locks.
      */
     private void setupOSDSubMenu(PopupMenu popup) {
-        SubMenu osd = popup.getMenu().addSubMenu("OSD");
+        SubMenu osd = popup.getMenu().addSubMenu(getResources().getString(R.string.menu4_osd));
         MenuItem lock = osd.add(osdManager.getTitle());
         lock.setOnMenuItemClickListener(item -> {
             osdManager.lockOSD(!osdManager.isOSDLocked());
@@ -660,11 +670,14 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：WFB-NG 密钥 (WFB-NG key)
      * Submenu handling WFB-NG logic (e.g. selecting gs.key from storage).
      */
     private void setupWFBSubMenu(PopupMenu popup) {
-        SubMenu wfb = popup.getMenu().addSubMenu("WFB-NG key");
-        MenuItem keyBtn = wfb.add("gs.key");
+        SubMenu wfb = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu5_wfbng_key));
+        MenuItem keyBtn = wfb.add(
+                getResources().getString(R.string.menu5_1_gskey));
         keyBtn.setOnMenuItemClickListener(item -> {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -675,20 +688,23 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：自适应链接
      * Submenu for Adaptive link functionality.
      * It creates two options:
      * - "Enable": toggles the adaptive link quality thread
      * - "Power": a submenu that lets the user choose the TX power (1, 10, 20, 30, 40)
      */
     private void setupAdaptiveLinkSubMenu(PopupMenu popup) {
-        SubMenu adaptiveMenu = popup.getMenu().addSubMenu("Adaptive link");
+        SubMenu adaptiveMenu = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu6_adaptive_link));
 
         SharedPreferences prefs = getSharedPreferences("general", MODE_PRIVATE);
         boolean adaptiveEnabled = prefs.getBoolean("adaptive_link_enabled", true);
         int adaptiveTxPower = prefs.getInt("adaptive_tx_power", 20);
 
         // Adaptive link Enable option
-        MenuItem adaptiveEnable = adaptiveMenu.add("Enable");
+        MenuItem adaptiveEnable = adaptiveMenu.add(
+                getResources().getString(R.string.menu0_enable));
         adaptiveEnable.setCheckable(true);
         adaptiveEnable.setChecked(adaptiveEnabled);
         adaptiveEnable.setOnMenuItemClickListener(item -> {
@@ -703,7 +719,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         });
 
         // Adaptive link Power submenu
-        SubMenu powerSubMenu = adaptiveMenu.addSubMenu("Power");
+        SubMenu powerSubMenu = adaptiveMenu.addSubMenu(
+                getResources().getString(R.string.menu6_2_power));
         int[] txOptions = {1, 10, 20, 30, 40};
         for (int power : txOptions) {
             MenuItem powerItem = powerSubMenu.add(String.valueOf(power));
@@ -729,7 +746,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         // Adaptive use FEC submenu
         boolean fecEnabled = prefs.getBoolean("custom_fec_enabled", true);
 
-        MenuItem fecEnable = adaptiveMenu.add("FEC");
+        MenuItem fecEnable = adaptiveMenu.add(
+                getResources().getString(R.string.menu6_3_fec));
         fecEnable.setCheckable(true);
         fecEnable.setChecked(fecEnabled);
         fecEnable.setOnMenuItemClickListener(item -> {
@@ -745,7 +763,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // LDPC option
         boolean ldpcEnabled = prefs.getBoolean("custom_ldpc_enabled", true);
-        MenuItem ldpcEnable = adaptiveMenu.add("LDPC");
+        MenuItem ldpcEnable = adaptiveMenu.add(
+                getResources().getString(R.string.menu6_4_ldpc));
         ldpcEnable.setCheckable(true);
         ldpcEnable.setChecked(ldpcEnabled);
         ldpcEnable.setOnMenuItemClickListener(item -> {
@@ -760,7 +779,8 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
 
         // STBC option
         boolean stbcEnabled = prefs.getBoolean("custom_stbc_enabled", true);
-        MenuItem stbcEnable = adaptiveMenu.add("STBC");
+        MenuItem stbcEnable = adaptiveMenu.add(
+                getResources().getString(R.string.menu6_4_stbc));
         stbcEnable.setCheckable(true);
         stbcEnable.setChecked(stbcEnabled);
         stbcEnable.setOnMenuItemClickListener(item -> {
@@ -871,18 +891,21 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：录像
      * Submenu for recording options, including start/stop DVR and toggling fMP4.
      */
     private void setupRecordingSubMenu(PopupMenu popup) {
-        SubMenu recording = popup.getMenu().addSubMenu("Recording");
+        SubMenu recording = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu7_recording));
 
-        MenuItem dvrBtn = recording.add(dvrFd == null ? "Start" : "Stop");
+        MenuItem dvrBtn = recording.add(dvrFd == null ?
+                getResources().getString(R.string.menu0_start) : getResources().getString(R.string.menu0_stop));
         dvrBtn.setOnMenuItemClickListener(item -> {
             startStopDvr();
             return true;
         });
 
-        MenuItem fmp4 = recording.add("fMP4");
+        MenuItem fmp4 = recording.add(getResources().getString(R.string.menu7_2_fmp4_format));
         fmp4.setCheckable(true);
         fmp4.setChecked(getDvrMP4());
         fmp4.setOnMenuItemClickListener(item -> {
@@ -894,7 +917,7 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             return false;
         });
 
-        MenuItem resetPermissions = recording.add("Reset DVR folder");
+        MenuItem resetPermissions = recording.add(getResources().getString(R.string.menu7_3_reset_dvr_folder));
         resetPermissions.setOnMenuItemClickListener(item -> {
             resetFolderPermissions();
             return true;
@@ -921,11 +944,13 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
     }
 
     /**
+     * 操作菜单：帮助
      * Submenu for help items, such as sending logs.
      */
     private void setupHelpSubMenu(PopupMenu popup) {
-        SubMenu help = popup.getMenu().addSubMenu("Help");
-        MenuItem logs = help.add("Send Logs");
+        SubMenu help = popup.getMenu().addSubMenu(
+                getResources().getString(R.string.menu9_help));
+        MenuItem logs = help.add(getResources().getString(R.string.menu9_1_send_log));
 
         // Increase logcat buffer to 10MB if possible
         try {
