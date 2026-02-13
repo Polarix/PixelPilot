@@ -627,7 +627,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         String[] channels = getResources().getStringArray(R.array.channels);
         for (String chnStr : channels) {
             chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
+                /* 切换信道 */
                 onChannelSettingChanged(Integer.parseInt(chnStr));
+                /* 更新信道信息 */
+                String toastText = getResources().getText(R.string.menu2_4_change_to_channel) + chnStr;
+                Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show();
                 return true;
             });
         }
@@ -643,21 +647,25 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 {
                     try
                     {
-                        /* 切换频道 */
-                        onChannelSettingChanged(Integer.parseInt(chnStr));
                         Log.w(TAG, "Searching channel " + chnStr + "...");
                         /* 显示信道信息 */
                         runOnUiThread(new Runnable() {
                             @Override
-                            public void run() {
-                                String toastText = getResources().getText(R.string.menu2_2_search_channel) + ": ";
-                                toastText = toastText + chnStr;
-                                Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show();
+                            public void run()
+                            {
+                                /* 切换频道 */
+                                onChannelSettingChanged(Integer.parseInt(chnStr));
+                                /* 显示搜索信息 */
+                                String searchNoticeText = getResources().getText(R.string.menu2_3_search_channel) + ": ";
+                                searchNoticeText = searchNoticeText + chnStr;
+                                binding.tvMessage.setText(searchNoticeText);
                             }
                         });
 
                         /* 等待信号输入，单位(ms) */
-                        Thread.sleep(2000L);
+                        /* 间隔太短会在一些低性能设备上因设备重启不及时而崩溃。 */
+                        /* 目前在紫光展锐SC9863A上初步测试通过。 */
+                        Thread.sleep(7500L);
                         if (VideoIsReceiving)
                         {
                             Log.w(TAG, "Bind channel " + chnStr + ".");
@@ -1459,8 +1467,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("wifi-channel", channel);
         editor.apply();
+        Log.w(TAG, "Stop device.");
         wfbLinkManager.stopAdapters();
+        Log.w(TAG, "Set channel " + channel + ".");
         wfbLinkManager.setChannel(channel);
+        Log.w(TAG, "Restart device.");
         wfbLinkManager.startAdapters();
     }
 

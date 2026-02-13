@@ -11,7 +11,8 @@
     <string name="menu2_channel">信道</string>
     <string name="menu2_1_current">当前信道</string>
     <string name="menu2_2_auto_search">自动搜索</string>
-    <string name="menu2_2_search_channel">搜索频道</string>
+    <string name="menu2_3_search_channel">搜索频道</string>
+    <string name="menu2_4_change_to_channel">切换到信道</string>
     <string name="menu3_bandwidth">带宽</string>
     <string name="menu3_1_current">当前带宽</string>
     <string name="menu4_osd">屏幕显示(OSD)</string>
