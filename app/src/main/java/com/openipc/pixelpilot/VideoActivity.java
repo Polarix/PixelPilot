@@ -86,6 +86,7 @@ import java.util.TimerTask;
 public class VideoActivity extends AppCompatActivity implements IVideoParamsChanged,
         WfbNGStatsChanged, MavlinkUpdate, SettingsChanged {
     private static final String TAG = "pixelpilot";
+    private static volatile boolean VideoIsReceiving = false;
     private static final int PICK_KEY_REQUEST_CODE = 1;
     private static final int PICK_DVR_REQUEST_CODE = 2;
     private static WifiManager wifiManager;
@@ -608,6 +609,21 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 getResources().getString(R.string.menu2_1_current) + " : " + channelPref);
         headerItem.setEnabled(false); // Makes it unclickable and grayed out like a label
 
+        /* 自动搜索频道 */
+        chnMenu.add(getResources().getString(R.string.menu2_2_auto_search)).setOnMenuItemClickListener(menuItem -> {
+            String[] channels = getResources().getStringArray(R.array.channels);
+            try
+            {
+                startSearchChannelProcess(channels);
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+            return true;
+        });
+
+        /* 手动选择频道 */
         String[] channels = getResources().getStringArray(R.array.channels);
         for (String chnStr : channels) {
             chnMenu.add(chnStr).setOnMenuItemClickListener(item -> {
@@ -615,6 +631,47 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 return true;
             });
         }
+    }
+
+    private void startSearchChannelProcess(final String[] strChannels) throws InterruptedException
+    {
+        new Thread(new Runnable() {
+            @Override // java.lang.Runnable
+            public final void run()
+            {
+                for (String chnStr : strChannels)
+                {
+                    try
+                    {
+                        /* 切换频道 */
+                        onChannelSettingChanged(Integer.parseInt(chnStr));
+                        Log.w(TAG, "Searching channel " + chnStr + "...");
+                        /* 显示信道信息 */
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String toastText = getResources().getText(R.string.menu2_2_search_channel) + ": ";
+                                toastText = toastText + chnStr;
+                                Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        /* 等待信号输入，单位(ms) */
+                        Thread.sleep(2000L);
+                        if (VideoIsReceiving)
+                        {
+                            Log.w(TAG, "Bind channel " + chnStr + ".");
+                            /* 结束等待 */
+                            break;
+                        }
+                    }
+                    catch (InterruptedException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
@@ -1460,6 +1517,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
             if (decodingInfo.currentFPS > 0) {
                 binding.tvMessage.setVisibility(View.GONE);
                 binding.wifiMessage.setVisibility(View.GONE);
+                /* 收到视频信号，设置标记 */
+                if(!VideoIsReceiving)
+                {
+                    VideoIsReceiving = true;
+                }
             }
             String info = "%dx%d@%.0f " + (decodingInfo.nCodec == 1 ? " H265 " : " H264 ")
                     + (decodingInfo.currentKiloBitsPerSecond > 1000 ? " %.1fMbps " : " %.1fKpbs ")
@@ -1478,9 +1540,16 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                 binding.tvMessage.setVisibility(View.INVISIBLE);
                 binding.tvMessage.setText("");
 
-                if (data.count_p_dec_err > 0) {
+                if (data.count_p_dec_err > 0)
+                {
+                    /* 等待密钥解码 */
                     binding.tvLinkStatus.setText("Waiting for session key.");
-                } else {
+                    VideoIsReceiving = false;
+                }
+                else
+                {
+                    /* 收到视频信号 */
+                    VideoIsReceiving = true;
                     // NOTE: The order of the entries when being added to the entries array
                     // determines their position around the center of the chart.
                     ArrayList<PieEntry> entries = new ArrayList<>();
@@ -1532,7 +1601,11 @@ public class VideoActivity extends AppCompatActivity implements IVideoParamsChan
                             data.count_p_fec_recovered,
                             data.count_p_lost));
                 }
-            } else {
+            }
+            else
+            {
+                /* 未收到数据 */
+                VideoIsReceiving = false;
                 binding.tvLinkStatus.setText("No Video Link");
             }
         });
